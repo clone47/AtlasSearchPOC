@@ -12,6 +12,9 @@ public class SimpleQuery
 
     public static void Main(string[] args)
     {
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         // allow automapping of the camelCase database fields to our MovieDocument
         var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
         ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
@@ -20,9 +23,6 @@ public class SimpleQuery
         var mongoClient = new MongoClient(MongoConnectionString);
         var mflixDatabase = mongoClient.GetDatabase("sample_mflix");
         var moviesCollection = mflixDatabase.GetCollection<MovieDocument>("movies");
-
-        Stopwatch stopWatch = new Stopwatch();
-        stopWatch.Start();
 
         // define and run pipeline
         var results = moviesCollection.Aggregate()
