@@ -57,7 +57,7 @@ class Program
 
 
         // Number of concurrent users to simulate
-        int concurrentUsers = 10;
+        int concurrentUsers = 2;
 
         var tasks = Enumerable.Range(0, concurrentUsers).Select(async userId =>
         {
