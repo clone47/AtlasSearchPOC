@@ -1,59 +1,94 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using MongoDB.Driver.Search;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
-public class SimpleQuery
+class Program
 {
-    private const string MongoConnectionString = "mongodb+srv://ayonalfaz:!L0v3atlas@poccluster.mhbvh.mongodb.net/?retryWrites=true&w=majority&appName=POCCluster";
-
-    public static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Stopwatch stopWatch = new Stopwatch();
-        stopWatch.Start();
+        string connectionString = "mongodb+srv://clone47:NlNP9xAJOqX7wg2v@poccluster.mhbvh.mongodb.net/?retryWrites=true&w=majority&appName=POCCluster";
+        var settings = MongoClientSettings.FromConnectionString(connectionString);
+        settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30); // Increase timeout if needed
+        var client = new MongoClient(settings);
+        var database = client.GetDatabase("POC_DB");
+        var collection = database.GetCollection<BsonDocument>("POC_Data");
 
-        // allow automapping of the camelCase database fields to our MovieDocument
-        var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
-        ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+        // Paths for log files
+        string logFilePath = "POC_Logs.txt";
+        string resourceUsagePath = "ResourceUsage.txt";
+        string dbStatsPath = "DB_Stats.txt";
 
-        // connect to your Atlas cluster
-        var mongoClient = new MongoClient(MongoConnectionString);
-        var mflixDatabase = mongoClient.GetDatabase("sample_mflix");
-        var moviesCollection = mflixDatabase.GetCollection<MovieDocument>("movies");
+        // Ensure logs are clean at the start
+        File.WriteAllText(logFilePath, string.Empty);
+        File.WriteAllText(resourceUsagePath, string.Empty);
+        File.WriteAllText(dbStatsPath, string.Empty);
 
-        // define and run pipeline
-        var results = moviesCollection.Aggregate()
-            .Search(Builders<MovieDocument>.Search.Text(movie => movie.Rated, "PG-13"))
-            .Project<MovieDocument>(Builders<MovieDocument>.Projection
-                .Include(movie => movie.Rated))
-            .Limit(10000)
-            .ToList();
+        // Define filter as BsonDocument
+        var filter = new BsonDocument("ProcessState", "INITIATED");
 
-        // print results
-        foreach (var movie in results)
+        // Aggregation pipeline for Atlas Search
+        var atlasPipeline = new[]
         {
-            Console.WriteLine(movie.ToJson());
-        }
+            new BsonDocument("$search", new BsonDocument
+            {
+                { "text", new BsonDocument
+                    {
+                        { "query", "INITIATED" },
+                        { "path", "ProcessState" }
+                    }
+                }
+            }),
+            new BsonDocument("$match", filter)
+        };
 
-        stopWatch.Stop();
-        // Get the elapsed time as a TimeSpan value.
-        TimeSpan ts = stopWatch.Elapsed;
+        // Number of concurrent users to simulate
+        int concurrentUsers = 2;
 
-        // Format and display the TimeSpan value.
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        Console.WriteLine("RunTime " + elapsedTime);
+        var tasks = Enumerable.Range(0, concurrentUsers).Select(async userId =>
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            // Measure normal MongoDB query execution time
+            stopwatch.Restart();
+            Console.WriteLine("Starting normal query...");
+            var normalResults = await collection.Find(filter).ToListAsync();
+            Console.WriteLine("Normal query completed!");
+            stopwatch.Stop();
+            long normalQueryTime = stopwatch.ElapsedMilliseconds;
+
+            // Measure Atlas Search query execution time
+            stopwatch.Restart();
+            Console.WriteLine("Starting atlas query...");
+            var atlasCursor = await collection.AggregateAsync<BsonDocument>(atlasPipeline);
+            var atlasResults = atlasCursor.ToList();
+            Console.WriteLine("Atlas query completed!");
+            stopwatch.Stop();
+            long atlasQueryTime = stopwatch.ElapsedMilliseconds;
+
+            // Log query times and performance difference
+            var log = $"User {userId + 1}:\n" +
+                      $"Normal Query Time: {normalQueryTime} ms\n" +
+                      $"Atlas Search Query Time: {atlasQueryTime} ms\n" +
+                      $"Performance Difference: {normalQueryTime - atlasQueryTime} ms\n\n";
+            File.AppendAllText(logFilePath, log);
+
+            // Fetch database statistics after each query execution
+            var dbStats = database.RunCommand<BsonDocument>(new BsonDocument { { "dbStats", 1 } });
+            File.AppendAllText(dbStatsPath, $"User {userId + 1} DB Stats:\n{dbStats}\n");
+
+            // Simulate logging of resource usage (could be integrated with external monitoring tools)
+            var simulatedResourceUsage = $"User {userId + 1} Resource Usage: Simulated CPU and Memory usage data.\n";
+            File.AppendAllText(resourceUsagePath, simulatedResourceUsage);
+        });
+
+        // Wait for all tasks to complete
+        await Task.WhenAll(tasks);
+
+        Console.WriteLine("POC Completed! Logs saved locally.");
     }
-}
-
-[BsonIgnoreExtraElements]
-public class MovieDocument
-{
-    [BsonIgnoreIfDefault]
-    public ObjectId Id { get; set; }
-    public string? Rated { get; set; }
 }

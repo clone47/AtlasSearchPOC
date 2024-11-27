@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.11.35208.52
+VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtlasSearchPOC", "AtlasSearchPOC.csproj", "{D4D29803-3B24-41BB-BE0C-E075781B9392}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasSearchPOC", "AtlasSearchPOC.csproj", "{9AB4A7E1-1B55-4FA5-9573-C1053F4367A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D4D29803-3B24-41BB-BE0C-E075781B9392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4D29803-3B24-41BB-BE0C-E075781B9392}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4D29803-3B24-41BB-BE0C-E075781B9392}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4D29803-3B24-41BB-BE0C-E075781B9392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AB4A7E1-1B55-4FA5-9573-C1053F4367A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AB4A7E1-1B55-4FA5-9573-C1053F4367A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AB4A7E1-1B55-4FA5-9573-C1053F4367A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AB4A7E1-1B55-4FA5-9573-C1053F4367A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {8771E471-9C8F-4E6D-89E7-02B6AAFF9F14}
+		SolutionGuid = {9BC2AC1B-E6DC-4249-A7C9-A18DF495F74A}
 	EndGlobalSection
 EndGlobal
