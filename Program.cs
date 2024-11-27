@@ -31,6 +31,14 @@ class Program
         // Define filter as BsonDocument
         var filter = new BsonDocument("ProcessState", "INITIATED");
 
+        // Get the default serializer registry
+        var serializerRegistry = MongoDB.Bson.Serialization.BsonSerializer.SerializerRegistry;
+        var documentSerializer = serializerRegistry.GetSerializer<BsonDocument>();
+
+        // Render the filter to a BsonDocument
+        var renderedFilter = filter.ToBsonDocument();
+
+        // Aggregation pipeline for Atlas Search
         // Aggregation pipeline for Atlas Search
         var atlasPipeline = new[]
         {
@@ -43,11 +51,13 @@ class Program
                     }
                 }
             }),
-            new BsonDocument("$match", filter)
+            new BsonDocument("$match", renderedFilter),
+            new BsonDocument("$limit", 100) // Limit results for faster performance
         };
 
+
         // Number of concurrent users to simulate
-        int concurrentUsers = 2;
+        int concurrentUsers = 10;
 
         var tasks = Enumerable.Range(0, concurrentUsers).Select(async userId =>
         {
