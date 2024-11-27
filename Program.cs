@@ -11,7 +11,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        string connectionString = "mongodb+srv://clone47:NlNP9xAJOqX7wg2v@poccluster.mhbvh.mongodb.net/?retryWrites=true&w=majority&appName=POCCluster";
+        string connectionString = "<mongodb+srv>";
         var settings = MongoClientSettings.FromConnectionString(connectionString);
         settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30); // Increase timeout if needed
         var client = new MongoClient(settings);
