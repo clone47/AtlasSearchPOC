@@ -80,3 +80,17 @@ Logs performance metrics and database statistics after each query:
 3.  **Performance Tracking**: Logs query execution times to analyze the difference between standard queries and Atlas Search.
     
 4.  **Resource Management**: Clears logs at the start of execution to avoid clutter.
+
+
+### Result:
+
+#### User 1 -
+*   Normal Query Time: 187300 ms
+*   Atlas Search Query Time: 206 ms
+*   Performance Difference: 187094 ms
+
+#### User 2 -
+*   Normal Query Time: 210004 ms
+*   Atlas Search Query Time: 158 ms
+*   Performance Difference: 209846 ms
+
